@@ -71,6 +71,7 @@ func (p *yurtReverseProxy) buildHandlerChain(apiHandler http.Handler) http.Handl
 	handler = util.WithRequestTrace(handler, p.maxRequestsInFlight)
 	handler = util.WithRequestClientComponent(handler)
 	handler = filters.WithRequestInfo(handler, p.resolver)
+	handler = util.NothingHandler(handler)
 	return handler
 }
 
