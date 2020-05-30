@@ -31,7 +31,7 @@ const (
 func NewCmdStartYurtHub(stopCh <-chan struct{}) *cobra.Command {
 	yurtHubOptions := options.NewYurtHubOptions()
 
-	file,err := os.OpenFile("/data/logs/yurthub.log",os.O_WRONLY&os.O_CREATE,0666)
+	file,err := os.OpenFile("/data/logs/yurthub.log",os.O_WRONLY&os.O_CREATE&os.O_APPEND,0666)
 	if err != nil{
 		fmt.Fprintf(os.Stderr,"log file open err\n")
 	}
