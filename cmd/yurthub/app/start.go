@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"github.com/alibaba/openyurt/cmd/yurthub/app/config"
 	"github.com/alibaba/openyurt/cmd/yurthub/app/options"
 	"github.com/alibaba/openyurt/pkg/yurthub/cachemanager"
@@ -15,8 +14,7 @@ import (
 	"github.com/alibaba/openyurt/pkg/yurthub/server"
 	"github.com/alibaba/openyurt/pkg/yurthub/storage/factory"
 	"github.com/alibaba/openyurt/pkg/yurthub/transport"
-	"os"
-
+	"flag"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/klog"
@@ -30,14 +28,9 @@ const (
 // NewCmdStartYurtHub creates a *cobra.Command object with default parameters
 func NewCmdStartYurtHub(stopCh <-chan struct{}) *cobra.Command {
 	yurtHubOptions := options.NewYurtHubOptions()
-
-	file,err := os.OpenFile("/data/logs/yurthub.log",os.O_WRONLY&os.O_CREATE&os.O_APPEND,0666)
-	if err != nil{
-		fmt.Fprintf(os.Stderr,"log file open err\n")
-	}
-	klog.SetOutput(file)
-	defer file.Close()
-
+	var flag *flag.FlagSet
+	flag.Set("log_dir","/data/logs/")
+	klog.InitFlags(flag)
 	cmd := &cobra.Command{
 		Use:   componentYurtHub,
 		Short: "Launch yurthub",
