@@ -36,7 +36,7 @@ const (
 // if no Accept header is set, application/vnd.kubernetes.protobuf will be used
 func WithRequestContentType(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		klog.Errorf("get req:%s\n",dumpHttpRequest(req))
+		dumpHttpRequest(req)
 		ctx := req.Context()
 		if info, ok := apirequest.RequestInfoFrom(ctx); ok {
 			if info.IsResourceRequest {
@@ -57,7 +57,7 @@ func WithRequestContentType(handler http.Handler) http.Handler {
 				req = req.WithContext(ctx)
 			}
 		}
-		klog.Errorf("get req:%s\n",dumpHttpRequest(req))
+		dumpHttpRequest(req)
 		handler.ServeHTTP(w, req)
 	})
 }
@@ -67,7 +67,7 @@ func WithRequestContentType(handler http.Handler) http.Handler {
 // can be supported to cache response. and with Edge-Cache header is also supported.
 func WithCacheHeaderCheck(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		klog.Errorf("get req:%s\n",dumpHttpRequest(req))
+		dumpHttpRequest(req)
 		ctx := req.Context()
 		if info, ok := apirequest.RequestInfoFrom(ctx); ok {
 			if info.IsResourceRequest {
@@ -89,7 +89,7 @@ func WithCacheHeaderCheck(handler http.Handler) http.Handler {
 // before the "/" when User-Agent include "/".
 func WithRequestClientComponent(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		klog.Errorf("get req:%s\n",dumpHttpRequest(req))
+		dumpHttpRequest(req)
 		ctx := req.Context()
 		if info, ok := apirequest.RequestInfoFrom(ctx); ok {
 			if info.IsResourceRequest {
@@ -114,15 +114,16 @@ func WithRequestClientComponent(handler http.Handler) http.Handler {
 func NothingHandler(handler http.Handler) http.Handler{
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		klog.Errorf("get req:%s\n",dumpHttpRequest(req))
+		dumpHttpRequest(req)
 		handler.ServeHTTP(w, req)
 	})
 }
 
-func dumpHttpRequest(req *http.Request) string{
+func dumpHttpRequest(req *http.Request) {
 	buffer := new(bytes.Buffer)
 	req.Write(buffer)
-	return buffer.String()
+	klog.V(3).Infof("get req:%s\n",buffer.String())
+	return
 }
 
 type wrapperResponseWriter struct {
@@ -185,7 +186,7 @@ func WithRequestTrace(handler http.Handler, limit int) http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		klog.Errorf("get req:%s\n",dumpHttpRequest(req))
+		dumpHttpRequest(req)
 		wrapperRW := newWrapperResponseWriter(req.Context(), w)
 		start := time.Now()
 
