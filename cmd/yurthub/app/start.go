@@ -28,18 +28,22 @@ const (
 // NewCmdStartYurtHub creates a *cobra.Command object with default parameters
 func NewCmdStartYurtHub(stopCh <-chan struct{}) *cobra.Command {
 	yurtHubOptions := options.NewYurtHubOptions()
+	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
+	klog.InitFlags(klogFlags)
 	cmd := &cobra.Command{
 		Use:   componentYurtHub,
 		Short: "Launch yurthub",
 		Long:  "Launch yurthub",
 		Run: func(cmd *cobra.Command, args []string) {
-			klog.InitFlags(nil)
-			flag.Set("log_dir", "/data/logs")
-			flag.Parse()
-			cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-				klog.V(1).Infof("FLAG: --%s=%q", flag.Name, flag.Value)
+			cmd.Flags().VisitAll(func(oneflag *pflag.Flag) {
+				f2 := klogFlags.Lookup(oneflag.Name)
+				if f2 != nil {
+					value := oneflag.Value.String()
+					f2.Value.Set(value)
+				}
+				klog.V(1).Infof("FLAG: --%s=%q", oneflag.Name, oneflag.Value)
 			})
-			
+
 			if err := options.ValidateOptions(yurtHubOptions); err != nil {
 				klog.Fatalf("validate options: %v", err)
 			}
@@ -49,7 +53,6 @@ func NewCmdStartYurtHub(stopCh <-chan struct{}) *cobra.Command {
 				klog.Fatalf("complete yurthub configuration error, %v", err)
 			}
 			klog.Infof("yurthub cfg: %#+v", yurtHubCfg)
-
 			if err := Run(yurtHubCfg, stopCh); err != nil {
 				klog.Fatalf("run yurthub failed, %v", err)
 			}
