@@ -1,6 +1,7 @@
 package app
 
 import (
+	"flag"
 	"github.com/alibaba/openyurt/cmd/yurthub/app/config"
 	"github.com/alibaba/openyurt/cmd/yurthub/app/options"
 	"github.com/alibaba/openyurt/pkg/yurthub/cachemanager"
@@ -14,7 +15,6 @@ import (
 	"github.com/alibaba/openyurt/pkg/yurthub/server"
 	"github.com/alibaba/openyurt/pkg/yurthub/storage/factory"
 	"github.com/alibaba/openyurt/pkg/yurthub/transport"
-	"flag"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/klog"
