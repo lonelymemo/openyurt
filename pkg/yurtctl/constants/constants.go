@@ -1,3 +1,19 @@
+/*
+Copyright 2020 The OpenYurt Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package constants
 
 const (
@@ -39,7 +55,7 @@ spec:
                 - "false"
       containers:
       - name: yurt-controller-manager
-        image: openyurt/yurt-controller-manager:latest
+        image: {{.image}}
         command:
         - yurt-controller-manager	
 `
@@ -63,12 +79,13 @@ spec:
           type: Directory
       containers:
       - name: yurtctl-servant
-        image: openyurt/yurtctl-servant:latest
+        image: {{.yurtctl_servant_image}}
+        imagePullPolicy: Always
         command:
         - /bin/sh
         - -c
         args:
-        - "sed -i 's|__kubernetes_service_host__|$(KUBERNETES_SERVICE_HOST)|g;s|__kubernetes_service_port_https__|$(KUBERNETES_SERVICE_PORT_HTTPS)|g;s|__node_name__|$(NODE_NAME)|g' /var/lib/openyurt/setup_edgenode && cp /var/lib/openyurt/setup_edgenode /tmp && nsenter -t 1 -m -u -n -i /var/tmp/setup_edgenode {{.action}} {{.provider}}"
+        - "sed -i 's|__kubernetes_service_host__|$(KUBERNETES_SERVICE_HOST)|g;s|__kubernetes_service_port_https__|$(KUBERNETES_SERVICE_PORT_HTTPS)|g;s|__node_name__|$(NODE_NAME)|g;s|__yurthub_image__|{{.yurthub_image}}|g' /var/lib/openyurt/setup_edgenode && cp /var/lib/openyurt/setup_edgenode /tmp && nsenter -t 1 -m -u -n -i /var/tmp/setup_edgenode {{.action}} {{.provider}}"
         securityContext:
           privileged: true
         volumeMounts:
