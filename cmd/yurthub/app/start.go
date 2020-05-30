@@ -28,9 +28,9 @@ const (
 // NewCmdStartYurtHub creates a *cobra.Command object with default parameters
 func NewCmdStartYurtHub(stopCh <-chan struct{}) *cobra.Command {
 	yurtHubOptions := options.NewYurtHubOptions()
-	var flag *flag.FlagSet
+	var flag flag.FlagSet
 	flag.Set("log_dir","/data/logs/")
-	klog.InitFlags(flag)
+	klog.InitFlags(&flag)
 	cmd := &cobra.Command{
 		Use:   componentYurtHub,
 		Short: "Launch yurthub",
