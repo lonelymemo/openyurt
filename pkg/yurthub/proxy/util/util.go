@@ -17,7 +17,6 @@ limitations under the License.
 package util
 
 import (
-	"bytes"
 	"context"
 	"net/http"
 	"strings"
@@ -120,9 +119,7 @@ func NothingHandler(handler http.Handler) http.Handler{
 }
 
 func dumpHttpRequest(req *http.Request) {
-	buffer := new(bytes.Buffer)
-	req.Write(buffer)
-	klog.V(3).Infof("get req:%s\n",buffer.String())
+	//klog.V(3).Infof("get req:%s ",req.URL.Path)
 	return
 }
 
