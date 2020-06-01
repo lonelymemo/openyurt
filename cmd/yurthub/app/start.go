@@ -1,7 +1,6 @@
 package app
 
 import (
-	"flag"
 	"github.com/alibaba/openyurt/cmd/yurthub/app/config"
 	"github.com/alibaba/openyurt/cmd/yurthub/app/options"
 	"github.com/alibaba/openyurt/pkg/yurthub/cachemanager"
@@ -28,22 +27,14 @@ const (
 // NewCmdStartYurtHub creates a *cobra.Command object with default parameters
 func NewCmdStartYurtHub(stopCh <-chan struct{}) *cobra.Command {
 	yurtHubOptions := options.NewYurtHubOptions()
-	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
-	klog.InitFlags(klogFlags)
 	cmd := &cobra.Command{
 		Use:   componentYurtHub,
 		Short: "Launch yurthub",
 		Long:  "Launch yurthub",
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Flags().VisitAll(func(oneflag *pflag.Flag) {
-				f2 := klogFlags.Lookup(oneflag.Name)
-				if f2 != nil {
-					value := oneflag.Value.String()
-					f2.Value.Set(value)
-				}
 				klog.V(1).Infof("FLAG: --%s=%q", oneflag.Name, oneflag.Value)
 			})
-
 			if err := options.ValidateOptions(yurtHubOptions); err != nil {
 				klog.Fatalf("validate options: %v", err)
 			}
