@@ -21,7 +21,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -131,8 +130,6 @@ func (cm *cacheManager) CacheResponse(ctx context.Context, prc io.ReadCloser, st
 	} else {
 		klog.V(5).Infof("cache %d bytes from response for %s", n, util.ReqInfoString(info))
 	}
-	//write data back
-	prc = ioutil.NopCloser(bytes.NewBuffer(buf.Bytes()))
 
 	if isList(ctx) {
 		return cm.saveListObject(ctx, info, buf.Bytes())
