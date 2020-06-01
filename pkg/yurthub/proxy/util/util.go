@@ -17,6 +17,7 @@ limitations under the License.
 package util
 
 import (
+	"bytes"
 	"context"
 	"io/ioutil"
 	"net/http"
@@ -123,13 +124,11 @@ func dumpHttpRequest(req *http.Request) {
 	klog.V(3).Infof("get req:%s\n",req.URL.RequestURI())
 	klog.V(3).Infoln(req.Header)
 	if req.Method != "GET"{
-		body,err := req.GetBody()
-		if err == nil {
-			rbody, err := ioutil.ReadAll(body)
+			reqbody, err := ioutil.ReadAll(req.Body)
 			if err == nil {
-				klog.V(3).Info(string(rbody))
+				klog.V(3).Info(string(reqbody))
+				req.Body = ioutil.NopCloser(bytes.NewBuffer(reqbody))
 			}
-		}
 	}
 	return
 }
