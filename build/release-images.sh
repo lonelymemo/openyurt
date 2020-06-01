@@ -9,7 +9,7 @@ YURTCTL_SERVANT_DIR=${YURT_ROOT}/config/yurtctl-servant
 DOCKER_BUILD_BASE_IDR=dockerbuild
 
 REPO="openyurt"
-TAG="v0.1.0-beta1"
+TAG="v0.2.1"
 readonly YURT_BIN_TARGETS=(
     yurthub
     yurt-controller-manager
@@ -42,7 +42,7 @@ function build_docker_image() {
 	       mkdir -p ${docker_build_path}
 
 	       local yurt_component_image="${REPO}/${binary}:${TAG}"
-		   local base_image="k8s.gcr.io/debian-iptables-amd64:v11.0.2"
+		   local base_image="gcrxio/debian-iptables-amd64:v11.0.2"
 	       cat <<EOF > "${docker_file_path}"
 FROM ${base_image}
 COPY ${docker_build_path}/${binary} /usr/local/bin/${binary}
