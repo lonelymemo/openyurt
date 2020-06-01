@@ -18,6 +18,7 @@ package util
 
 import (
 	"context"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -119,7 +120,17 @@ func NothingHandler(handler http.Handler) http.Handler{
 }
 
 func dumpHttpRequest(req *http.Request) {
-	//klog.V(3).Infof("get req:%s ",req.URL.Path)
+	klog.V(3).Infof("get req:%s\n",req.URL.RequestURI())
+	klog.V(3).Infoln(req.Header)
+	if req.Method != "GET"{
+		body,err := req.GetBody()
+		if err == nil {
+			rbody, err := ioutil.ReadAll(body)
+			if err == nil {
+				klog.V(3).Info(string(rbody))
+			}
+		}
+	}
 	return
 }
 
