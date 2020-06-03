@@ -121,7 +121,7 @@ func NothingHandler(handler http.Handler) http.Handler{
 }
 
 func dumpHttpRequest(req *http.Request) {
-	klog.V(3).Infof("get req:%s\n",req.URL.RequestURI())
+	klog.V(3).Infof("%s %s\n",req.Method,req.URL.RequestURI())
 	klog.V(3).Infoln(req.Header)
 	if req.Method != "GET"{
 			reqbody, err := ioutil.ReadAll(req.Body)
