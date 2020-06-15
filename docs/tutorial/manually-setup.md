@@ -44,12 +44,28 @@ autonomous edge nodes during disconnection.
 $ kc ap -f config/setup/yurt-controller-manager.yaml
 deployment.apps/yurt-controller-manager created
 ```
+## Disable the default nodelifecycle controller
+
+To allow the yurt-controller-mamanger to work properly, we need to turn off the default nodelifecycle controller.
+The nodelifecycle controller can be disabled by restarting the kube-controller-manager with a proper `--controllers` 
+option. Assume that the original option looks like `--controllers=*,bootstrapsigner,tokencleaner`, to disable 
+the nodelifecycle controller, we change the option to `--controllers=*,bootstrapsigner,tokencleaner,-nodelifecycle`. 
+
+If the kube-controller-manager is deployed as a static pod on the master node, and you have the permission to log in 
+to the master node, then above operations can be done by revising the file 
+`/etc/kubernetes/manifests/kube-controller-manager.yaml`. After revision, the kube-controller-manager will be 
+restarted automatically.
 
 ## Setup Yurthub
 
-After the Yurt controller manager is up and running, we will setup Yurthub as the static pod by typing the following command,
+After the Yurt controller manager is up and running, we will setup Yurthub as the static pod. Before proceeding, 
+please get the apiserver's address (i.e., ip:port), which will be used to replace the place holder in the template 
+file `config/setup/yurthub.yaml`. In the following command, we assume that the address of the apiserver is 1.2.3.4:5678
 ```bash
-$ cat config/setup/yurthub.yaml | sed 's|__pki_path__|/etc/kubernetes/pki|' > /tmp/yurthub-ack.yaml &&
+$ cat config/setup/yurthub.yaml | 
+sed 's|__pki_path__|/etc/kubernetes/pki|;
+s|__kubernetes_service_host__|1.2.3.4|;
+s|__kubernetes_service_port_https__|5678|' > /tmp/yurthub-ack.yaml &&
 scp -i <yourt-ssh-identity-file> /tmp/yurthub-ack.yaml root@us-west-1.192.168.0.88:/etc/kubernetes/manifests
 ```
 and the Yurthub will be ready in minutes.
