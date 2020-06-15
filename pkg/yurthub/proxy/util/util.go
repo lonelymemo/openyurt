@@ -112,7 +112,7 @@ func WithRequestClientComponent(handler http.Handler) http.Handler {
 	})
 }
 
-func NothingHandler(handler http.Handler) http.Handler{
+func NothingHandler(handler http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		dumpHttpRequest(req)
@@ -121,14 +121,14 @@ func NothingHandler(handler http.Handler) http.Handler{
 }
 
 func dumpHttpRequest(req *http.Request) {
-	klog.V(3).Infof("%s %s\n",req.Method,req.URL.RequestURI())
+	klog.V(3).Infof("%s %s\n", req.Method, req.URL.RequestURI())
 	klog.V(3).Infoln(req.Header)
-	if req.Method != "GET"{
-			reqbody, err := ioutil.ReadAll(req.Body)
-			if err == nil {
-				klog.V(3).Info(string(reqbody))
-				req.Body = ioutil.NopCloser(bytes.NewBuffer(reqbody))
-			}
+	if req.Method != "GET" {
+		reqbody, err := ioutil.ReadAll(req.Body)
+		if err == nil {
+			klog.V(3).Info(string(reqbody))
+			req.Body = ioutil.NopCloser(bytes.NewBuffer(reqbody))
+		}
 	}
 	return
 }
