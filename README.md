@@ -1,8 +1,13 @@
-<img src="docs/img/OpenYurt.png" width="400" height="94" align="middle" /><br/>
+<div align="center">
+  
+<img src="docs/img/OpenYurt.png" width="400" height="94"><br/>
 
+[![Version](https://img.shields.io/badge/OpenYurt-v0.1.0--beta.1-orange)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Go Report Card](https://goreportcard.com/badge/github.com/alibaba/openyurt)](https://goreportcard.com/report/github.com/alibaba/openyurt)
 [![Build Status](https://travis-ci.org/alibaba/openyurt.svg?branch=master)](https://travis-ci.org/alibaba/openyurt)
+
+</div>
 
 |![notification](docs/img/bell-outline-badge.svg) What is NEW!|
 |------------------|
@@ -21,7 +26,7 @@ OpenYurt is suitable for common edge computing use cases whose requirements incl
 OpenYurt has the following advantages in terms of compatibility and usability.
 - **Kubernetes native**. It provides full Kubernetes API compatibility. All Kubernetes workloads, services, 
   operators, CNI plugins, and CSI plugins are supported.
-- **Seamless conversion**. It provides a tool to easily convert a native Kubernative to be "edge" ready.
+- **Seamless conversion**. It provides a tool to easily convert a native Kubernetes to be "edge" ready.
   The extra resource and maintenance costs of the OpenYurt components are very low.
 - **Node autonomy**. It provides mechanisms to tolerate unstable or disconnected cloud-edge networking.
   The applications run in the edge nodes are not affected even if the nodes are offline. 
@@ -89,10 +94,19 @@ Build all binaries (`yurt-controller-manager`, `yurthub`, `yurtctl`)
 make build
 ```
 
-Build all docker images 
+Build specific binary for specific architecture. (`amd64`,`arm`,`arm64`)
+```mysql based
+GOOS=linux GOARCH=arm64 make build WHAT=cmd/yurtctl
+```
 
+Build all docker images for all supported architectures.
 ```bash
 make release
+```
+
+Build all docker images for specific architecture.
+```base
+make release ARCH=arm64
 ```
 
 ## Uninstall
@@ -112,7 +126,7 @@ If you have any questions or want to contribute, you are welcome to communicate 
 Other active communication channels:
 
 - Mailing List: TODO
-- Dingtalk Group(钉钉讨论群)
+- Dingtalk Group (钉钉讨论群)
 
 <div align="left">
   <img src="docs/img/ding.jpeg" width=25% title="dingtalk">
