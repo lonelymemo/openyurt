@@ -14,22 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package types
 
-import (
-	"flag"
-
-	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/klog"
-
-	"github.com/alibaba/openyurt/pkg/yurttunnel/agent"
-	"github.com/alibaba/openyurt/pkg/yurttunnel/projectinfo"
-)
-
-func main() {
-	cmd := agent.NewYurttunnelAgentCommand(wait.NeverStop)
-	cmd.Flags().AddGoFlagSet(flag.CommandLine)
-	if err := cmd.Execute(); err != nil {
-		klog.Fatalf("%s failed: %s", projectinfo.GetAgentName(), err)
-	}
+type NodeAttribute struct {
 }

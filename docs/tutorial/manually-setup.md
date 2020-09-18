@@ -70,6 +70,10 @@ scp -i <yourt-ssh-identity-file> /tmp/yurthub-ack.yaml root@us-west-1.192.168.0.
 ```
 and the Yurthub will be ready in minutes.
 
+## Setup Yurt-tunnel (Optional)
+
+Please refer to this [document](.//yurt-tunnel.md#5-setup-the-yurt-tunnel-manually) to setup Yurttunnel manually. 
+
 ## Reset the Kubelet 
 
 By now, we have setup all required components for the OpenYurt cluster, next, we only need to reset the 
@@ -93,7 +97,7 @@ sed -i '/certificate-authority-data/d;
 In order to let kubelet to use the revised kubeconfig, we edit the drop-in file of the kubelet 
 service (i.e., `/etc/systemd/system/kubelet.service.d/10-kubeadm.conf`)
 ```bash
-sed -i "s|--kubeconfig=.*kubelet.conf|--kubeconfig=$OPENYURT_DIR\/kubelet.conf|g" \
+sed -i "s|KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=\/etc\/kubernetes\/bootstrap-kubelet.conf\ --kubeconfig=\/etc\/kubernetes\/kubelet.conf|KUBELET_KUBECONFIG_ARGS=--kubeconfig=\/var\/lib\/openyurt\/kubelet.conf|g" \
     /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 ```
 

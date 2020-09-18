@@ -17,15 +17,32 @@ limitations under the License.
 package server
 
 import (
-	"context"
 	"crypto/tls"
-	"errors"
 )
 
-// RunServer runs the yurttunnel-server
-func RunServer(ctx context.Context,
+// TunnelServermanages tunnels between itself and agents, receives requests
+// from apiserver, and forwards requests to corresponding agents
+type TunnelServer interface {
+	Run() error
+}
+
+// NewTunnelServer returns a new TunnelServer
+func NewTunnelServer(
+	egressSelectorEnabled bool,
 	interceptorServerUDSFile,
-	serverMasterAddr, serverAgentAddr string,
-	tlsCfg *tls.Config) error {
-	return errors.New("NOT IMPLEMENT YET")
+	serverMasterAddr,
+	serverMasterInsecureAddr,
+	serverAgentAddr string,
+	serverCount int,
+	tlsCfg *tls.Config) TunnelServer {
+	ats := anpTunnelServer{
+		egressSelectorEnabled:    egressSelectorEnabled,
+		interceptorServerUDSFile: interceptorServerUDSFile,
+		serverMasterAddr:         serverMasterAddr,
+		serverMasterInsecureAddr: serverMasterInsecureAddr,
+		serverAgentAddr:          serverAgentAddr,
+		serverCount:              serverCount,
+		tlsCfg:                   tlsCfg,
+	}
+	return &ats
 }

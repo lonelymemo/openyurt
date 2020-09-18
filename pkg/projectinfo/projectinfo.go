@@ -22,30 +22,13 @@ import (
 
 var (
 	projectPrefix = "yurt"
+	labelPrefix   = "openyurt.io"
 	gitVersion    = "v0.0.0"
 	gitCommit     = "unknown"
 	buildDate     = "1970-01-01T00:00:00Z"
+	compiler      = runtime.Compiler
+	platform      = runtime.GOOS + "/" + runtime.GOARCH
 )
-
-type ProjectInfo struct {
-	ProjectPrefix string
-	GitVersion    string
-	GitCommit     string
-	BuildDate     string
-	Compiler      string
-	Platform      string
-}
-
-func Get() ProjectInfo {
-	return ProjectInfo{
-		ProjectPrefix: projectPrefix,
-		GitVersion:    gitVersion,
-		GitCommit:     gitCommit,
-		BuildDate:     buildDate,
-		Compiler:      runtime.Compiler,
-		Platform:      runtime.GOOS + "/" + runtime.GOARCH,
-	}
-}
 
 func ShortAgentVersion() string {
 	commit := gitCommit
@@ -63,10 +46,20 @@ func ShortServerVersion() string {
 	return GetServerName() + "/" + gitVersion + "-" + commit
 }
 
+func GetProjectPrefix() string {
+	return projectPrefix
+}
+
 func GetServerName() string {
-	return Get().ProjectPrefix + "tunnel-server"
+	return projectPrefix + "tunnel-server"
 }
 
 func GetAgentName() string {
-	return Get().ProjectPrefix + "tunnel-agent"
+	return projectPrefix + "tunnel-agent"
+}
+
+// GetEdgeWorkerLabelKey returns the edge-worker label, which is used to
+// identify if a node is a edge node ("true") or a cloud node ("false")
+func GetEdgeWorkerLabelKey() string {
+	return labelPrefix + "/is-edge-worker"
 }

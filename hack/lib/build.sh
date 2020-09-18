@@ -14,37 +14,39 @@
 
 #!/usr/bin/env bash
 
+set -x
+
 readonly YURT_ALL_TARGETS=(
-    cmd/yurtctl
-    cmd/yurthub
-    cmd/yurt-controller-manager
+    yurtctl
+    yurthub
+    yurt-controller-manager
+    yurt-tunnel-server
+    yurt-tunnel-agent
 )
+
+# we will generates setup yaml files for following components
+readonly YURT_YAML_TARGETS=(
+    yurthub
+    yurt-controller-manager
+    yurt-tunnel-server
+    yurt-tunnel-agent
+)
+
+#PROJECT_PREFIX=${PROJECT_PREFIX:-yurt}
+#LABEL_PREFIX=${LABEL_PREFIX:-openyurt.io}
+#GIT_VERSION="v0.1.1"
+#GIT_COMMIT=$(git rev-parse HEAD)
+#BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 
 # project_info generates the project information and the corresponding valuse 
 # for 'ldflags -X' option
 project_info() {
-    PROJECT_PREFIX=${PROJECT_PREFIX:-yurt}
-    GIT_VERSION="v0.1.1"
-    GIT_COMMIT=$(git rev-parse HEAD)
-    BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-   
-    PROJECT_INFO_PKG=${YURT_MOD}/pkg/yurttunnel/projectinfo
+    PROJECT_INFO_PKG=${YURT_MOD}/pkg/projectinfo
     echo "-X ${PROJECT_INFO_PKG}.projectPrefix=${PROJECT_PREFIX}"
+    echo "-X ${PROJECT_INFO_PKG}.labelPrefix=${LABEL_PREFIX}"
     echo "-X ${PROJECT_INFO_PKG}.gitVersion=${GIT_VERSION}"
     echo "-X ${PROJECT_INFO_PKG}.gitCommit=${GIT_COMMIT}"
     echo "-X ${PROJECT_INFO_PKG}.buildDate=${BUILD_DATE}"
-}
-
-# get_output_name generates the executable's name. If the $PROJECT_PREFIX
-# is set, it subsitutes the prefix of the executable's name with the env, 
-# otherwise the basename of the target is used
-get_output_name() {
-    local oup_name=$(basename $1)
-    PROJECT_PREFIX=${PROJECT_PREFIX:-}
-    if [ ! -z $PROJECT_PREFIX ]; then
-        oup_name=${oup_name/yurt/$PROJECT_PREFIX}
-    fi
-    echo $oup_name
 }
 
 # get_binary_dir_with_arch generated the binary's directory with GOOS and GOARCH.
@@ -80,6 +82,55 @@ build_binaries() {
     cd ${target_bin_dir}
     for binary in "${targets[@]}"; do
       echo "Building ${binary}"
-      go build -o $(get_output_name $binary) -ldflags "${goldflags:-}" -gcflags "${gcflags:-}" ${goflags} $YURT_ROOT/${binary}
+      go build -o $(get_output_name $binary) \
+          -ldflags "${goldflags:-}" \
+          -gcflags "${gcflags:-}" ${goflags} $YURT_ROOT/cmd/$(canonicalize_target $binary)
+    done
+}
+
+# gen_yamls generates yaml files for user specified components by 
+# subsituting the place holders with envs
+gen_yamls() {
+    REPO=${REPO:-openyurt}
+    TAG=${TAG:-latest}
+    PKI_PATH=${PKI_PATH:-/etc/kubernetes/pki}
+    # we use the serivce/kubernetes's DNS as the server address for hub
+    kube_svc_addr=${KUBE_SVC_ADDR:-kubernetes}
+    kube_svc_port=${KUBE_SVC_PORT:-}
+    
+    server_addr=https://$kube_svc_addr
+    if [ ! -z $kube_svc_port ]; then
+        server_addr=https://$kube_svc_addr:$kube_svc_port
+    fi
+
+    local -a yaml_targets=() 
+    for arg; do
+        # ignoring go flags 
+        [[ "$arg" == -* ]] && continue
+        target=$(basename $arg)
+        # only add target that is in the ${YURT_YAML_TARGETS} list
+        if [[ "${YURT_YAML_TARGETS[@]}" =~ "$target" ]]; then
+            yaml_targets+=("$target")        
+        fi
+    done
+    # if not specified, generate yaml for default yaml targets
+    if [ ${#yaml_targets[@]} -eq 0 ]; then
+        yaml_targets=("${YURT_YAML_TARGETS[@]}")
+    fi
+    echo $yaml_targets
+    
+    local yaml_dir=$YURT_OUTPUT_DIR/setup/
+    mkdir -p $yaml_dir
+    for yaml_target in "${yaml_targets[@]}"; do
+        oup_file=${yaml_target/yurt/$PROJECT_PREFIX}
+        echo "generating yaml file for $oup_file"
+        sed "s|__project_prefix__|${PROJECT_PREFIX}|g;
+        s|__label_prefix__|$LABEL_PREFIX|g;
+        s|__repo__|$REPO|g;
+        s|__tag__|$TAG|g;
+        s|__pki_path__|$PKI_PATH|g;
+        s|__server_addr__|$server_addr|g;" \
+            $YURT_ROOT/config/yaml-template/$yaml_target.yaml > \
+            $yaml_dir/$oup_file.yaml
     done
 }
